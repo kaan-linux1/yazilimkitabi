@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # C# .NET 8 Web API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: csharp_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    restart: always
+    # Nginx arka planda (Docker Network üzerinde) `http://backend:8080` üzerinden erişecektir.
+    # Dışarıya 8080 açık olursa direkt test edilebilir:
+    ports:
+      - "8080:8080"
+
+  # React Frontend (Nginx sunucusu olarak)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: react_ui
+    ports:
+      - "80:80" # Ubuntu sunucunuzun IP'sini tarayıcıya yazdığınızda React direkt açılır
+    depends_on:
+      - backend
+    restart: always
